@@ -13,6 +13,8 @@
 
 #import "DZNWebView.h"
 
+@class DZNWebViewController;
+
 /**
  Types of supported navigation tools.
  */
@@ -39,10 +41,16 @@ typedef NS_OPTIONS(NSUInteger, DZNsupportedWebActions) {
     DZNWebActionOpenDolphin = (1 << 6),
 };
 
+@protocol DZNWebViewControllerDelegate <NSObject>
+- (void)saveButtonPressed:(DZNWebViewController *)dZNWebViewController;
+@end
+
 /**
  A very simple web browser with useful navigation and tooling features.
  */
 @interface DZNWebViewController : UIViewController <DZNNavigationDelegate, WKUIDelegate, UITableViewDataSource, UITableViewDelegate>
+
+@property (weak, nonatomic) id <DZNWebViewControllerDelegate> delegate;
 
 /** The web view that the controller manages. */
 @property (nonatomic, strong) DZNWebView *webView;
@@ -90,7 +98,7 @@ typedef NS_OPTIONS(NSUInteger, DZNsupportedWebActions) {
 
 /**
  Starts loading a new request. Useful to programatically update the web content.
-
+ 
  @param URL The HTTP or file URL to be requested.
  @param baseURL A URL that is used to resolve relative URLs within the document.
  */

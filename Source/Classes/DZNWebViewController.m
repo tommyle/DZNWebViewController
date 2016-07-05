@@ -50,7 +50,7 @@ static char DZNWebViewControllerKVOContext = 0;
 - (instancetype)initWithURL:(NSURL *)URL
 {
     NSParameterAssert(URL);
-
+    
     self = [self init];
     if (self) {
         _URL = URL;
@@ -102,6 +102,9 @@ static char DZNWebViewControllerKVOContext = 0;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc ] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
+    self.navigationItem.leftBarButtonItem = doneButton;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -133,14 +136,14 @@ static char DZNWebViewControllerKVOContext = 0;
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-	[super viewWillDisappear:animated];
+    [super viewWillDisappear:animated];
     
     [self clearProgressViewAnimated:animated];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-	[super viewDidDisappear:animated];
+    [super viewDidDisappear:animated];
     
     [self.webView stopLoading];
 }
@@ -437,7 +440,7 @@ static char DZNWebViewControllerKVOContext = 0;
     if ([URL isFileURL]) {
         NSData *data = [[NSData alloc] initWithContentsOfURL:URL];
         NSString *HTMLString = [[NSString alloc] initWithData:data encoding:NSStringEncodingConversionAllowLossy];
-
+        
         [self.webView loadHTMLString:HTMLString baseURL:baseURL];
     }
     else {
@@ -476,7 +479,7 @@ static char DZNWebViewControllerKVOContext = 0;
     if (!self.allowHistory || self.webView.backForwardList.backList.count == 0 || sender.state != UIGestureRecognizerStateBegan) {
         return;
     }
-
+    
     [self presentHistoryControllerForTool:DZNWebNavigationToolBackward fromView:sender.view];
 }
 
@@ -526,16 +529,21 @@ static char DZNWebViewControllerKVOContext = 0;
     self.navigationController.hidesBarsOnSwipe = self.hideBarsWithGestures;
     self.navigationController.hidesBarsWhenKeyboardAppears = self.hideBarsWithGestures;
     self.navigationController.hidesBarsWhenVerticallyCompact = self.hideBarsWithGestures;
-
+    
     if (self.hideBarsWithGestures) {
         [self.navigationBar addObserver:self forKeyPath:@"hidden" options:NSKeyValueObservingOptionNew context:&DZNWebViewControllerKVOContext];
         [self.navigationBar addObserver:self forKeyPath:@"center" options:NSKeyValueObservingOptionNew context:&DZNWebViewControllerKVOContext];
         [self.navigationBar addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew context:&DZNWebViewControllerKVOContext];
     }
-
+    
     if (!DZN_IS_IPAD && self.navigationController.toolbarHidden && self.toolbarItems.count > 0) {
         [self.navigationController setToolbarHidden:NO];
     }
+}
+
+- (void)done:(id)sender
+{
+    [self.navigationController dismissViewControllerAnimated:true completion:nil];
 }
 
 // Light hack for adding custom gesture recognizers to UIBarButtonItems
@@ -561,7 +569,7 @@ static char DZNWebViewControllerKVOContext = 0;
 - (void)updateToolbarItems
 {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:[self.webView isLoading]];
-
+    
     self.backwardBarItem.enabled = [self.webView canGoBack];
     self.forwardBarItem.enabled = [self.webView canGoForward];
     
@@ -586,7 +594,10 @@ static char DZNWebViewControllerKVOContext = 0;
         return;
     }
     
-    [self presentActivityControllerWithItem:self.webView.URL.absoluteString andTitle:self.webView.title sender:sender];
+    if ([self.delegate respondsToSelector:@selector(saveButtonPressed:)]) {
+        [self.delegate saveButtonPressed:self];
+    }
+    //    [self presentActivityControllerWithItem:self.webView.URL.absoluteString andTitle:self.webView.title sender:sender];
 }
 
 - (void)presentActivityControllerWithItem:(id)item andTitle:(NSString *)title sender:(id)sender
@@ -686,7 +697,7 @@ static char DZNWebViewControllerKVOContext = 0;
     switch (error.code) {
         case NSURLErrorCancelled:   return;
     }
-
+    
     self.title = nil;
 }
 
@@ -741,7 +752,7 @@ static char DZNWebViewControllerKVOContext = 0;
     
     cell.textLabel.text = item.title;
     cell.detailTextLabel.text = [item.URL absoluteString];
-
+    
     return cell;
 }
 
