@@ -41,16 +41,10 @@ typedef NS_OPTIONS(NSUInteger, DZNsupportedWebActions) {
     DZNWebActionOpenDolphin = (1 << 6),
 };
 
-@protocol DZNWebViewControllerDelegate <NSObject>
-- (void)saveButtonPressed:(DZNWebViewController *)dZNWebViewController;
-@end
-
 /**
  A very simple web browser with useful navigation and tooling features.
  */
 @interface DZNWebViewController : UIViewController <DZNNavigationDelegate, WKUIDelegate, UITableViewDataSource, UITableViewDelegate>
-
-@property (weak, nonatomic) id <DZNWebViewControllerDelegate> delegate;
 
 /** The web view that the controller manages. */
 @property (nonatomic, strong) DZNWebView *webView;
@@ -103,6 +97,13 @@ typedef NS_OPTIONS(NSUInteger, DZNsupportedWebActions) {
  @param baseURL A URL that is used to resolve relative URLs within the document.
  */
 - (void)loadURL:(NSURL *)URL baseURL:(NSURL *)baseURL;
+
+/**
+ Overridable method for custom action when the activity button is pressed
+ 
+ @param sender the caller
+ */
+- (void)presentActivityController:(id)sender;
 
 ///------------------------------------------------
 /// @name Appearance customisation

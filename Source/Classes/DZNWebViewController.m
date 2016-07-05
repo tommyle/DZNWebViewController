@@ -590,14 +590,7 @@ static char DZNWebViewControllerKVOContext = 0;
 
 - (void)presentActivityController:(id)sender
 {
-    if (!self.webView.URL.absoluteString) {
-        return;
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(saveButtonPressed:)]) {
-        [self.delegate saveButtonPressed:self];
-    }
-    //    [self presentActivityControllerWithItem:self.webView.URL.absoluteString andTitle:self.webView.title sender:sender];
+    //Overridable method: do stuff here
 }
 
 - (void)presentActivityControllerWithItem:(id)item andTitle:(NSString *)title sender:(id)sender
