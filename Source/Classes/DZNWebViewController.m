@@ -102,9 +102,6 @@ static char DZNWebViewControllerKVOContext = 0;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc ] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
-    self.navigationItem.leftBarButtonItem = doneButton;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -559,11 +556,6 @@ static char DZNWebViewControllerKVOContext = 0;
     if (!DZN_IS_IPAD && self.navigationController.toolbarHidden && self.toolbarItems.count > 0) {
         [self.navigationController setToolbarHidden:NO];
     }
-}
-
-- (void)done:(id)sender
-{
-    [self.navigationController dismissViewControllerAnimated:true completion:nil];
 }
 
 // Light hack for adding custom gesture recognizers to UIBarButtonItems
