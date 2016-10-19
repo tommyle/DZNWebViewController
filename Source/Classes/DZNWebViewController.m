@@ -72,10 +72,10 @@ static char DZNWebViewControllerKVOContext = 0;
 {
     self.supportedWebNavigationTools = DZNWebNavigationToolAll;
     self.supportedWebActions = DZNWebActionAll;
+    self.webNavigationPrompt = DZNWebNavigationPromptAll;
     self.showLoadingProgress = YES;
     self.hideBarsWithGestures = YES;
     self.allowHistory = YES;
-    self.showPageTitleAndURL = YES;
     
     self.webView = [[DZNWebView alloc] initWithFrame:self.view.bounds configuration:[WKWebViewConfiguration new]];
     self.webView.backgroundColor = [UIColor whiteColor];
@@ -365,7 +365,7 @@ static char DZNWebViewControllerKVOContext = 0;
 
 - (void)setTitle:(NSString *)title
 {
-    if (!self.showPageTitleAndURL) {
+    if (self.webNavigationPrompt == DZNWebNavigationPromptNone) {
         [super setTitle:title];
         return;
     }
@@ -382,26 +382,30 @@ static char DZNWebViewControllerKVOContext = 0;
         self.navigationItem.titleView = label;
     }
     
-    if (title.length == 0) {
-        label.attributedText = nil;
-        return;
+    UIFont *titleFont = self.navigationBar.titleTextAttributes[NSFontAttributeName] ? : [UIFont boldSystemFontOfSize:14.0];
+    UIFont *urlFont = [UIFont fontWithName:titleFont.fontName size:titleFont.pointSize-2.0];
+    UIColor *textColor = self.navigationBar.titleTextAttributes[NSForegroundColorAttributeName] ? : [UIColor blackColor];
+    
+    NSMutableString *text = [NSMutableString new];
+    
+    if (title.length > 0 && self.showNavigationPromptTitle) {
+        [text appendFormat:@"%@", title];
+        
+        if (url.length > 0 && self.showNavigationPromptURL) {
+            [text appendFormat:@"\n"];
+        }
     }
     
-    UIFont *titleFont = self.navigationBar.titleTextAttributes[NSFontAttributeName] ?: [UIFont boldSystemFontOfSize:12.0];
-    UIFont *urlFont = [UIFont fontWithName:titleFont.fontName size:titleFont.pointSize-2.0];
-    UIColor *textColor = self.navigationBar.titleTextAttributes[NSForegroundColorAttributeName] ?: [UIColor blackColor];
-    
-    NSMutableString *text = [NSMutableString stringWithString:title];
-    
-    if (url.length > 0) {
-        [text appendFormat:@"\n%@", url];
+    if (url.length > 0 && self.showNavigationPromptURL) {
+        [text appendFormat:@"%@", url];
     }
     
     NSDictionary *attributes = @{NSFontAttributeName: titleFont, NSForegroundColorAttributeName: textColor};
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:attributes];
-    
-    if (url.length > 0) {
-        [attributedString addAttribute:NSFontAttributeName value:urlFont range:[text rangeOfString:url]];
+    NSRange urlRange = [text rangeOfString:url];
+
+    if (urlRange.location != NSNotFound && self.showNavigationPromptTitle) {
+        [attributedString addAttribute:NSFontAttributeName value:urlFont range:urlRange];
     }
     
     label.attributedText = attributedString;
@@ -424,6 +428,22 @@ static char DZNWebViewControllerKVOContext = 0;
     
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:error.localizedDescription delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles: nil];
     [alert show];
+}
+
+- (BOOL)showNavigationPromptTitle
+{
+    if ((self.webNavigationPrompt & DZNWebNavigationPromptTitle) > 0 || self.webNavigationPrompt == DZNWebNavigationPromptAll) {
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)showNavigationPromptURL
+{
+    if ((self.webNavigationPrompt & DZNWebNavigationPromptURL) > 0 || self.webNavigationPrompt == DZNWebNavigationPromptAll) {
+        return YES;
+    }
+    return NO;
 }
 
 
@@ -677,7 +697,7 @@ static char DZNWebViewControllerKVOContext = 0;
 
 - (void)webView:(DZNWebView *)webView didFinishNavigation:(WKNavigation *)navigation
 {
-    if (self.showPageTitleAndURL) {
+    if (self.webNavigationPrompt > DZNWebNavigationPromptNone) {
         self.title = self.webView.title;
     }
 }
