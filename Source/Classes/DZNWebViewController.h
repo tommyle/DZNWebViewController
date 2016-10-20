@@ -117,6 +117,13 @@ typedef NS_OPTIONS(NSUInteger, DZNWebNavigationPrompt) {
  */
 - (void)presentActivityController:(id)sender;
 
+/**
+ Overridable method for navigating backwards
+ 
+ @param sender the caller
+ */
+- (void)goBackward:(id)sender
+
 ///------------------------------------------------
 /// @name Appearance customisation
 ///------------------------------------------------

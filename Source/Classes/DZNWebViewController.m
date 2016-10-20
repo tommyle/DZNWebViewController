@@ -470,7 +470,11 @@ static char DZNWebViewControllerKVOContext = 0;
 {
     if ([self.webView canGoBack]) {
         [self.webView goBack];
+        
+        return true;
     }
+    
+    return false;
 }
 
 - (void)goForward:(id)sender
