@@ -631,10 +631,6 @@ static char DZNWebViewControllerKVOContext = 0;
 
 - (void)clearProgressViewAnimated:(BOOL)animated
 {
-    if (!_progressView) {
-        return;
-    }
-    
     [UIView animateWithDuration:animated ? 0.25 : 0.0
                      animations:^{
                          self.progressView.alpha = 0;
