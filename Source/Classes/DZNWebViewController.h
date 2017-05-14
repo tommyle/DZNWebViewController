@@ -122,7 +122,7 @@ typedef NS_OPTIONS(NSUInteger, DZNWebNavigationPrompt) {
  
  @param sender the caller
  */
-- (BOOL)goBackward:(id)sender;
+- (void)goBackward:(id)sender;
 
 ///------------------------------------------------
 /// @name Appearance customisation

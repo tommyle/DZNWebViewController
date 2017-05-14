@@ -466,7 +466,7 @@ static char DZNWebViewControllerKVOContext = 0;
     }
 }
 
-- (BOOL)goBackward:(id)sender
+- (void)goBackward:(id)sender
 {
     if ([self.webView canGoBack]) {
         [self.webView goBack];
